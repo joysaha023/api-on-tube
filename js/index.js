@@ -17,7 +17,12 @@ const fetchCategories = () => {
 }
 
 const fetchDataByCategories = (categoryID) => {
-    console.log(categoryID)
+    const url = `https://openapi.programming-hero.com/api/videos/category/${categoryID}`;
+    fetch(url)
+    .then((res) => res.json())
+    .then(({data}) => {
+        
+    })
 }
 
 

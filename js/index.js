@@ -1,5 +1,6 @@
 const btnContainer = document.getElementById('btn-container');
 const cardContainer = document.getElementById('card-container')
+const errorEl = document.getElementById('error-element')
 
 let selectedCategory = 1000;
 
@@ -25,9 +26,19 @@ const fetchDataByCategories = (categoryID) => {
     fetch(url)
     .then((res) => res.json())
     .then(({data}) => {
+        if (data.length === 0){
+            errorEl.classList.remove('hidden')
+        }
+        else{
+            errorEl.classList.add('hidden')
+        }
         cardContainer.innerHTML = ''
         data.forEach((video) => {
-            
+            let verifiedBadge = ''
+            if(video.authors[0].verified){
+                verifiedBadge = `<img class="w-6 h-6" src="./images/verify.png" alt="">`
+            }
+
             const newCard = document.createElement('div')
             newCard.innerHTML = `
             <div class="card w-full bg-base-100 shadow-xl">
@@ -44,7 +55,7 @@ const fetchDataByCategories = (categoryID) => {
                         <h2 class="card-title">${video.title}</h2>
                         <div class="flex mt-3">
                             <p class="">${video.authors[0].profile_name}</p>
-                            <img class="w-6 h-6" src="./images/verify.png" alt="">
+                            ${verifiedBadge}
                         </div>
                         <p class="mt-3">${video.others.views}</p>
                     </div>

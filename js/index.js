@@ -1,8 +1,15 @@
 const btnContainer = document.getElementById('btn-container');
 const cardContainer = document.getElementById('card-container')
 const errorEl = document.getElementById('error-element')
+const sortBtn = document.getElementById('sort-btn')
 
 let selectedCategory = 1000;
+let sortByView = false;
+
+sortBtn.addEventListener('click', () =>{
+    sortByView = true;
+    fetchDataByCategories(selectedCategory, sortByView)
+})
 
 const fetchCategories = () => {
     const url = 'https://openapi.programming-hero.com/api/videos/categories';
@@ -12,20 +19,41 @@ const fetchCategories = () => {
             data.forEach((card) => {
                 console.log(card)
                 const newBtn = document.createElement('button')
-                newBtn.className = 'btn btn-ghost bg-slate-700 text-white text-lg';
+                newBtn.className = 'category-btn btn btn-ghost bg-slate-700 text-white text-lg';
                 newBtn.innerText = card.category
-                newBtn.addEventListener('click', () => fetchDataByCategories(card.category_id))
+                newBtn.addEventListener('click', () => {
+                    fetchDataByCategories(card.category_id)
+                    const allBtns = document.querySelectorAll('.category-btn')
+                    for(const btns of allBtns){
+                        btns.classList.remove('bg-red-600')
+                    }
+                    newBtn.classList.add('bg-red-600');
+
+
+                })
                 btnContainer.appendChild(newBtn)
             })
         })
 }
 
-const fetchDataByCategories = (categoryID) => {
+const fetchDataByCategories = (categoryID, sortByView) => {
     selectedCategory = categoryID;
     const url = `https://openapi.programming-hero.com/api/videos/category/${categoryID}`;
     fetch(url)
     .then((res) => res.json())
     .then(({data}) => {
+
+        if (sortByView){
+            data.sort((a, b) =>{
+                const totalViewSrtFirst = a.others.views;
+                const totalViewSrtSecond = b.others.views;
+                const totalViewFisrtNumber = parseFloat(totalViewSrtFirst.replace("k", '')) || 0;
+                const totalViewSecondNumber = parseFloat(totalViewSrtSecond.replace("k", '')) || 0;
+                return totalViewSecondNumber - totalViewFisrtNumber;
+            })
+        }
+
+
         if (data.length === 0){
             errorEl.classList.remove('hidden')
         }
@@ -70,4 +98,4 @@ const fetchDataByCategories = (categoryID) => {
 
 
 fetchCategories();
-fetchDataByCategories(selectedCategory);
+fetchDataByCategories(selectedCategory, sortByView);
